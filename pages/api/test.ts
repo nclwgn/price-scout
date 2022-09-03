@@ -7,12 +7,16 @@ interface TestUrlAndElementRequest {
   element: string;
 }
 
+interface TestUrlAndElementResponse {
+  foundContent: string;
+}
+
 export default async function TestUrlAndElement(
   req: NextApiRequest,
-  res: NextApiResponse<string>
+  res: NextApiResponse<TestUrlAndElementResponse>
 ) {
   if (req.method !== 'POST')
-    return res.status(400);
+    res.status(400).end();
     
   const content = JSON.parse(req.body) as TestUrlAndElementRequest;
 
@@ -25,8 +29,8 @@ export default async function TestUrlAndElement(
   const foundDesiredElement = dom.window.document.querySelector(`#${content.element}, .${content.element}`);
 
   if (foundDesiredElement) {
-    res.status(200).json(JSON.stringify({ foundContent: foundDesiredElement.textContent }))
+    res.status(200).json({ foundContent: foundDesiredElement.textContent ?? '' });
   }
 
-  res.status(400);
+  res.status(400).end();
 }
