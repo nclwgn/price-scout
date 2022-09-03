@@ -26,7 +26,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <div className='container mx-auto mt-20 flex flex-col gap-y-5'>
+    <div className='container mx-auto flex flex-col gap-y-5'>
       <h1 className='text-center'>
         Insira a URL da página que deseja rastrear
       </h1>
