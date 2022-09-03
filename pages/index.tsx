@@ -17,9 +17,7 @@ const Home: NextPage = () => {
     });
 
     if (response.status === 200) {
-      const body = JSON.parse(await response.json());
-
-      console.log(body.foundContent);
+      const body = await response.json();
 
       setFoundContentResponse(body.foundContent);
     }

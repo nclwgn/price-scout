@@ -11,26 +11,61 @@ interface TestUrlAndElementResponse {
   foundContent: string;
 }
 
+interface TestUrlAndElementErrorResponse {
+  errorCode: string;
+  reason?: string;
+}
+
 export default async function TestUrlAndElement(
   req: NextApiRequest,
-  res: NextApiResponse<TestUrlAndElementResponse>
+  res: NextApiResponse<TestUrlAndElementResponse | TestUrlAndElementErrorResponse>
 ) {
   if (req.method !== 'POST')
-    res.status(400).end();
+    return res.status(400).send({ errorCode: 'method-not-allowed' });
     
-  const content = JSON.parse(req.body) as TestUrlAndElementRequest;
-
-  const result = await fetch(content.url);
-
-  const text = await result.text();
-
-  const dom = new JSDOM(text);
-
-  const foundDesiredElement = dom.window.document.querySelector(`#${content.element}, .${content.element}`);
-
-  if (foundDesiredElement) {
-    res.status(200).json({ foundContent: foundDesiredElement.textContent ?? '' });
+  let content: TestUrlAndElementRequest;
+  try {
+    content = JSON.parse(req.body) as TestUrlAndElementRequest;
+  }
+  catch (error) {
+    return res.status(400).send({ errorCode: 'invalid-json' });
   }
 
-  res.status(400).end();
+  // Checks required params
+  if (!content.element)
+    return res.status(400).send({ errorCode: 'element-required' });
+
+  if (!content.url)
+    return res.status(400).send({ errorCode: 'url-required' });
+
+  let pageCrawl: Response;
+  try {
+    pageCrawl = await fetch(content.url);
+  }
+  catch (error: any) {
+    return res.status(400).send({
+      errorCode: 'unable-fetch-url',
+      reason: error
+    });
+  }
+
+  let pageDom: JSDOM;
+  try {
+    const pageText = await pageCrawl.text();
+    pageDom = new JSDOM(pageText);
+  }
+  catch (error: any) {
+    return res.status(400).send({
+      errorCode: 'dom-parsing-error',
+      reason: error
+    })
+  }
+
+  const foundDesiredElement = pageDom.window.document.querySelector(`#${content.element}, .${content.element}`);
+
+  if (!foundDesiredElement) {
+    return res.status(400).send({ errorCode: 'element-not-found' });
+  }
+  
+  res.status(200).json({ foundContent: foundDesiredElement.textContent ?? '' });
 }
