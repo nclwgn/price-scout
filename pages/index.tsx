@@ -1,13 +1,16 @@
 import type { NextPage } from 'next'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Badge } from '../components/Badge';
 
 const Home: NextPage = () => {
   const [searchUrl, setSearchUrl] = useState('');
   const [elementClassOrId, setElementClassOrId] = useState('');
+  const [trackingName, setTrackingName] = useState('');
 
   const [foundContentResponse, setFoundContentResponse] = useState<string>();
 
   const [isTesting, setIsTesting] = useState<boolean>(false);
+  const [isValidTest, setIsValidTest] = useState<boolean>(false);
 
   async function onTestElementClick() {
     setIsTesting(true);
@@ -25,6 +28,11 @@ const Home: NextPage = () => {
         const body = await response.json();
   
         setFoundContentResponse(body.foundContent);
+
+        const foundNumber = Number(body.foundContent);
+        if (foundNumber) {
+          setIsValidTest(true);
+        }
       }
     }
     catch (error) {
@@ -34,6 +42,11 @@ const Home: NextPage = () => {
       setIsTesting(false);
     }
   }
+
+  useEffect(() => {
+    if (isValidTest)
+      setIsValidTest(false);
+  }, [searchUrl, elementClassOrId]);
 
   return (
     <div className='container mx-auto grid grid-cols-2 gap-5'>
@@ -47,7 +60,7 @@ const Home: NextPage = () => {
           </p>
           <input 
             type='text'
-            className='w-full text-xl px-3 py-1 text-center'
+            className='w-full text-xl text-center'
             value={searchUrl}
             onChange={(e) => setSearchUrl(e.target.value)}
             disabled={isTesting}
@@ -60,7 +73,7 @@ const Home: NextPage = () => {
           </p>
           <input 
             type='text'
-            className='w-full text-xl px-3 py-1 text-center'
+            className='w-full text-xl text-center'
             value={elementClassOrId}
             onChange={(e) => setElementClassOrId(e.target.value)}
             disabled={isTesting}
@@ -90,17 +103,31 @@ const Home: NextPage = () => {
             Iniciar
           </button>
 
-          <p>Resultados do teste</p>
+          <div className='flex gap-5'>
+            <p>Resultados do teste </p>
+            {isValidTest && <Badge type='success'>Teste válido</Badge>}
+          </div>
 
           <p className='text-xs text-center'>
             {foundContentResponse}
           </p>
         </div>
 
-        <div className='flex justify-end mt-5'>
+        <div className='flex mt-5 gap-2 items-end'>
           
-          <button className='text-lg success'>
-            Adicionar rastreador
+          <div className='grow'>
+            <p className={!isValidTest ? 'opacity-50' : ''}>Nome do rastreador</p>
+            <input
+              type='text'
+              className='w-full text-xl text-center'
+              value={trackingName}
+              onChange={(e) => setTrackingName(e.target.value)}
+              disabled={!isValidTest}
+            />
+          </div>
+
+          <button className='text-lg success' disabled={!isValidTest}>
+            Adicionar
           </button>
 
         </div>
