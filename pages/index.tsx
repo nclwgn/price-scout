@@ -69,7 +69,7 @@ const Home: NextPage = () => {
 
         <div>
           <p>
-            Classe ou Id do elemento
+            Seletor de query
           </p>
           <input 
             type='text'
