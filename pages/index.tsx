@@ -43,21 +43,6 @@ const Home: NextPage = () => {
     }
   }
 
-  async function onTestChromiumClick() {
-    try {
-      const response = await fetch('/api/test-chromium', {
-        method: 'POST',
-        body: JSON.stringify({
-          url: searchUrl,
-          element: elementClassOrId
-        })
-      });
-    }
-    catch (error) {
-      console.log(error);
-    }
-  }
-
   useEffect(() => {
     if (isValidTest)
       setIsValidTest(false);
@@ -84,7 +69,7 @@ const Home: NextPage = () => {
 
         <div>
           <p>
-            Classe ou Id do elemento
+            Seletor de query
           </p>
           <input 
             type='text'
@@ -143,10 +128,6 @@ const Home: NextPage = () => {
 
           <button className='text-lg success' disabled={!isValidTest}>
             Adicionar
-          </button>
-
-          <button className='text-lg success' onClick={onTestChromiumClick}>
-            Rota de testes
           </button>
 
         </div>

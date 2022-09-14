@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { JSDOM } from 'jsdom';
+import { scrape as chromiumScrape } from '../../services/chromiumScraping';
+import { parse } from '../../utils/domParsing';
 
 interface TestUrlAndElementRequest {
   url: string;
@@ -20,6 +21,8 @@ export default async function TestUrlAndElement(
   req: NextApiRequest,
   res: NextApiResponse<TestUrlAndElementResponse | TestUrlAndElementErrorResponse>
 ) {
+
+  // Request parsing and validation
   if (req.method !== 'POST')
     return res.status(400).send({ errorCode: 'method-not-allowed' });
     
@@ -38,34 +41,29 @@ export default async function TestUrlAndElement(
   if (!content.url)
     return res.status(400).send({ errorCode: 'url-required' });
 
-  let pageCrawl: Response;
-  try {
-    pageCrawl = await fetch(content.url);
-  }
-  catch (error: any) {
-    return res.status(400).send({
-      errorCode: 'unable-fetch-url',
-      reason: error
+  // Tries to get the content via Chromium
+  const chromium = await chromiumScrape(content.url);
+
+  if (chromium.error || !chromium.content) {
+    res.status(400).json({
+      errorCode: chromium.error?.code ?? '',
+      reason: chromium.error?.reason
     });
+    return;
   }
 
-  let pageDom: JSDOM;
-  try {
-    const pageText = await pageCrawl.text();
-    pageDom = new JSDOM(pageText);
-  }
-  catch (error: any) {
-    return res.status(400).send({
-      errorCode: 'dom-parsing-error',
-      reason: error
-    })
+  const domParsing = parse(content.element, chromium.content);
+
+  if (domParsing.error || !domParsing.found) {
+    res.status(400).json({
+      errorCode: domParsing.error?.code ?? '',
+      reason: domParsing.error?.reason
+    });
+    return;
   }
 
-  const foundDesiredElement = pageDom.window.document.querySelector(`#${content.element}, .${content.element}`);
-
-  if (!foundDesiredElement) {
-    return res.status(400).send({ errorCode: 'element-not-found' });
-  }
+  res.status(200).json({
+    foundContent: domParsing.found
+  });
   
-  res.status(200).json({ foundContent: foundDesiredElement.textContent ?? '' });
 }
