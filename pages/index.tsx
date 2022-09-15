@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import { useEffect, useState } from 'react';
 import { Badge } from '../components/Badge';
 import { Button } from '../components/Button';
+import { Heading } from '../components/Heading';
 
 const Home: NextPage = () => {
   const [searchUrl, setSearchUrl] = useState('');
@@ -53,7 +54,7 @@ const Home: NextPage = () => {
     <div className='container mx-auto grid grid-cols-2 gap-5'>
 
       <section className='flex flex-col gap-y-5'>
-        <h1>Crie um novo rastreamento</h1>
+        <Heading level={1}>Crie um novo rastreamento</Heading>
 
         <div>
           <p>
@@ -86,9 +87,9 @@ const Home: NextPage = () => {
       <section>
 
         <div className='rounded-lg bg-gray-800 p-5 flex flex-col gap-y-5'>
-          <h2>
+          <Heading level={2}>
             Teste de rastreamento
-          </h2>
+          </Heading>
 
           <Button
             onClick={onTestElementClick}

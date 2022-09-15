@@ -1,5 +1,6 @@
 import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { Button } from "../../components/Button";
+import { Heading } from "../../components/Heading";
 import { Table } from "../../components/Table";
 import { prisma } from "../../services/prisma";
 
@@ -19,7 +20,7 @@ export default function Products({
   return (
     <div className='container mx-auto'>
       <div className='flex justify-between'>
-        <h1>Listagem de produtos</h1>
+        <Heading level={1}>Listagem de produtos</Heading>
         <Button variant='success'>Adicionar</Button>
       </div>
 
@@ -51,7 +52,7 @@ export default function Products({
   );
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<ProductsProps>> {
+export async function getServerSideProps(): Promise<GetServerSidePropsResult<ProductsProps>> {
   const products = await prisma.product.findMany({
     include: {
       _count: {
