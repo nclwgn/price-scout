@@ -25,7 +25,7 @@ function TableHead({
 }: TableHeadProps) {
   return (
     <div
-      className='table-header-group border-b-2 border-white/10 bg-black/10 uppercase'
+      className='table-header-group border-b-2 border-white/10 bg-black/10 uppercase font-bold'
       {...rest}
     >
       <TableRow>
