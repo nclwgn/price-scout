@@ -1,6 +1,7 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react';
 import { Badge } from '../components/Badge';
+import { Button } from '../components/Button';
 
 const Home: NextPage = () => {
   const [searchUrl, setSearchUrl] = useState('');
@@ -89,10 +90,10 @@ const Home: NextPage = () => {
             Teste de rastreamento
           </h2>
 
-          <button
-            className='text-lg primary flex gap-3 justify-center items-center'
+          <Button
             onClick={onTestElementClick}
             disabled={isTesting || searchUrl.length <= 0 || elementClassOrId.length <= 0}
+            variant='primary'
           >
             {isTesting &&
               <span className='flex'>
@@ -101,7 +102,7 @@ const Home: NextPage = () => {
               </span>
             }
             Iniciar
-          </button>
+          </Button>
 
           <div className='flex gap-5'>
             <p>Resultados do teste </p>
@@ -126,9 +127,13 @@ const Home: NextPage = () => {
             />
           </div>
 
-          <button className='text-lg success' disabled={!isValidTest}>
+          <Button 
+            variant='success'
+            disabled={!isValidTest}
+            size='lg'
+          >
             Adicionar
-          </button>
+          </Button>
 
         </div>
 

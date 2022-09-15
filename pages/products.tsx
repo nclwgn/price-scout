@@ -1,3 +1,4 @@
+import { Button } from "../components/Button";
 import { Table } from "../components/Table";
 
 export default function Products() {
@@ -5,7 +6,7 @@ export default function Products() {
     <div className='container mx-auto'>
       <div className='flex justify-between'>
         <h1>Listagem de produtos</h1>
-        <button className='success'>Adicionar</button>
+        <Button variant='success'>Adicionar</Button>
       </div>
 
       <Table>
@@ -18,34 +19,34 @@ export default function Products() {
           <Table.Cell>Headset Corsair Void Elite Gaming Wireless</Table.Cell>
           <Table.Cell>2</Table.Cell>
           <Table.Cell text='right'>
-            <button className='danger sm'>X</button>
+            <Button variant='danger' size='sm'>X</Button>
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Headset Corsair Void Elite Gaming Wireless</Table.Cell>
           <Table.Cell>2</Table.Cell>
           <Table.Cell text='right'>
-            <button className='danger sm'>X</button>
+            <Button variant='danger' size='sm'>X</Button>
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Headset Corsair Void Elite Gaming Wireless</Table.Cell>
           <Table.Cell>2</Table.Cell>
           <Table.Cell text='right'>
-            <button className='danger sm'>X</button>
+            <Button variant='danger' size='sm'>X</Button>
           </Table.Cell>
         </Table.Row>
         <Table.Row>
           <Table.Cell>Headset Corsair Void Elite Gaming Wireless</Table.Cell>
           <Table.Cell>2</Table.Cell>
           <Table.Cell text='right'>
-            <button className='danger sm'>X</button>
+            <Button variant='danger' size='sm'>X</Button>
           </Table.Cell>
         </Table.Row>
       </Table>
 
       <div className='flex justify-end'>
-        <button className='success'>Adicionar</button>
+        <Button variant='success'>Adicionar</Button>
       </div>
     </div>
   );

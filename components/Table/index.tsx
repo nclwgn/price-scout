@@ -1,4 +1,5 @@
-import { HTMLProps } from "react";
+import { HTMLProps } from 'react';
+import cx from 'classnames';
 
 interface TableProps extends Omit<HTMLProps<HTMLDivElement>, 'className'> {}
 
@@ -61,7 +62,7 @@ function TableCell({
 }: TableCellProps) {
   return (
     <div
-      className={`table-cell py-2 px-10 text-${text}`}
+      className={cx('table-cell py-2 px-10', `text-${text}`)}
       {...rest}
     >
       {children}
