@@ -1,8 +1,9 @@
-import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
+import { GetServerSidePropsResult } from "next";
 import { Button } from "../../components/Button";
 import { Heading } from "../../components/Heading";
 import { Table } from "../../components/Table";
 import { prisma } from "../../services/prisma";
+import { BiRadar, BiTrash } from "react-icons/bi";
 
 interface Product {
   id: number;
@@ -36,9 +37,15 @@ export default function Products({
             <Table.Row key={product.id}>
               <Table.Cell>{product.name}</Table.Cell>
               <Table.Cell>{product.trackerCount}</Table.Cell>
-              <Table.Cell text='right'>
-                <Button variant='primary' size='sm'>T</Button>
-                <Button variant='danger' size='sm'>X</Button>
+              <Table.Cell>
+                <div className='flex justify-end gap-1 items-center'>
+                  <Button variant='primary' size='sm'>
+                    <BiRadar size={16} />
+                  </Button>
+                  <Button variant='danger' size='sm'>
+                    <BiTrash size={16} />
+                  </Button>
+                </div>
               </Table.Cell>
             </Table.Row>
           ))}

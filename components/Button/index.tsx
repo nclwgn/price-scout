@@ -16,7 +16,7 @@ const variantUtility: Record<ButtonVariant, string> = {
 }
 
 const sizingUtility: Record<ButtonSize, string> = {
-  sm: 'px-2 py-0',
+  sm: 'px-2 py-1',
   md: 'px-3 py-1',
   lg: 'text-lg px-4 py-1'
 }
