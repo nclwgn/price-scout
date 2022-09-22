@@ -3,7 +3,7 @@ import { Button } from "../../components/Button";
 import { Heading } from "../../components/Heading";
 import { Table } from "../../components/Table";
 import { prisma } from "../../services/prisma";
-import { BiPlus, BiRadar, BiTrash } from "react-icons/bi";
+import { BiPlus, BiRadar, BiScan, BiTrash } from "react-icons/bi";
 import { useRouter } from "next/router";
 
 interface Product {
@@ -46,6 +46,9 @@ export default function Products({
               <Table.Cell>{product.trackerCount}</Table.Cell>
               <Table.Cell>
                 <div className='flex justify-end gap-1 items-center'>
+                  <Button variant='success' size='sm'>
+                    <BiScan size={16} />
+                  </Button>
                   <Button variant='primary' size='sm' onClick={() => router.push(`/products/${product.id}`)}>
                     <BiRadar size={16} />
                   </Button>

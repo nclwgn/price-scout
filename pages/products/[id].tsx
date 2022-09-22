@@ -33,11 +33,18 @@ export default function ProductDetails({
             {product.name}
           </Heading>
         </div>
-        <Button variant='success'>
-          <div className='flex items-center gap-1'>
-            <BiRadar /> Adicionar rastreador
-          </div>
-        </Button>
+        <div className='flex gap-1'>
+          <Button variant='success'>
+            <div className='flex items-center gap-1'>
+              <BiScan /> Rastrear todos agora
+            </div>
+          </Button>
+          <Button variant='success'>
+            <div className='flex items-center gap-1'>
+              <BiRadar /> Adicionar rastreador
+            </div>
+          </Button>
+        </div>
       </div>
 
       <div className='mt-5 font-bold uppercase w-100'>
@@ -75,7 +82,12 @@ export default function ProductDetails({
         </Table>
       </div>
 
-      <div className='flex justify-end'>
+      <div className='flex justify-end gap-1'>
+        <Button variant='success'>
+          <div className='flex items-center gap-1'>
+            <BiScan /> Rastrear todos agora
+          </div>
+        </Button>
         <Button variant='success'>
           <div className='flex items-center gap-1'>
             <BiRadar /> Adicionar rastreador
