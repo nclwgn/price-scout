@@ -3,7 +3,8 @@ import { Button } from "../../components/Button";
 import { Heading } from "../../components/Heading";
 import { Table } from "../../components/Table";
 import { prisma } from "../../services/prisma";
-import { BiRadar, BiTrash } from "react-icons/bi";
+import { BiPlus, BiRadar, BiTrash } from "react-icons/bi";
+import { useRouter } from "next/router";
 
 interface Product {
   id: number;
@@ -18,11 +19,17 @@ interface ProductsProps {
 export default function Products({
   products
 }: ProductsProps) {
+  const router = useRouter();
+
   return (
     <div className='container mx-auto'>
       <div className='flex justify-between'>
         <Heading level={1}>Listagem de produtos</Heading>
-        <Button variant='success'>Adicionar</Button>
+        <Button variant='success'>
+          <div className='flex items-center gap-1'>
+            <BiPlus /> Adicionar produto
+          </div>
+        </Button>
       </div>
 
       <div className='my-5'>
@@ -39,7 +46,7 @@ export default function Products({
               <Table.Cell>{product.trackerCount}</Table.Cell>
               <Table.Cell>
                 <div className='flex justify-end gap-1 items-center'>
-                  <Button variant='primary' size='sm'>
+                  <Button variant='primary' size='sm' onClick={() => router.push(`/products/${product.id}`)}>
                     <BiRadar size={16} />
                   </Button>
                   <Button variant='danger' size='sm'>
@@ -53,7 +60,11 @@ export default function Products({
       </div>
 
       <div className='flex justify-end'>
-        <Button variant='success'>Adicionar</Button>
+        <Button variant='success'>
+          <div className='flex items-center gap-1'>
+            <BiPlus /> Adicionar produto
+          </div>
+        </Button>
       </div>
     </div>
   );
