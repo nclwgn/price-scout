@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes } from "react";
 import cx from 'classnames';
 
-type ButtonVariant = 'primary' | 'success' | 'danger';
+type ButtonVariant = 'primary' | 'success' | 'danger' | 'secondary';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'size'> {
@@ -12,7 +12,8 @@ interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'cla
 const variantUtility: Record<ButtonVariant, string> = {
   primary: 'bg-blue-900 border-blue-900 enabled:hover:border-blue-700',
   success: 'bg-green-900 border-green-900 enabled:hover:border-green-700',
-  danger: 'bg-red-900 border-red-900 enabled:hover:border-red-700'
+  danger: 'bg-red-900 border-red-900 enabled:hover:border-red-700',
+  secondary: 'bg-gray-600 border-gray-600 enabled:hover:border-gray-400'
 }
 
 const sizingUtility: Record<ButtonSize, string> = {
