@@ -1,36 +1,16 @@
 import { JSDOM } from 'jsdom';
 
 interface ParseResult {
-  found?: string;
-  error?: {
-    code: string;
-    reason?: any;
-  }
+  found: string;
 }
 
 export const parse = (querySelector: string, content: string): ParseResult => {
-  let pageDom: JSDOM;
-
-  try {
-    pageDom = new JSDOM(content);
-  }
-  catch (error: any) {
-    return {
-      error: {
-        code: 'dom-parsing-error',
-        reason: error
-      }
-    }
-  }
+  const pageDom = new JSDOM(content);
 
   const foundDesiredElement = pageDom.window.document.querySelector(querySelector);
 
   if (!foundDesiredElement || !foundDesiredElement.textContent) {
-    return {
-      error: {
-        code: 'content-not-found'
-      }
-    }
+    throw new Error('Content not found');
   }
 
   return {

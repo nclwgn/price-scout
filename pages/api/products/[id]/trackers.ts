@@ -9,7 +9,7 @@ interface CreateTrackerRequest {
 interface Tracker {
   id: number;
   url: string;
-  element: string;
+  querySelector: string;
 }
 
 export default async function CreateTracker(
@@ -42,7 +42,7 @@ export default async function CreateTracker(
       data: {
         productId: Number(productId),
         url: content.url,
-        element: content.querySelector
+        querySelector: content.querySelector
       }
     });
   }

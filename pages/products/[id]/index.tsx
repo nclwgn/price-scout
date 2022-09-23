@@ -5,11 +5,12 @@ import { Button } from "../../../components/Button";
 import { Heading } from "../../../components/Heading";
 import { Table } from "../../../components/Table";
 import { prisma } from "../../../services/prisma";
+import { TrackerRow } from "./components/TrackerRow";
 
 interface Tracker {
   id: number;
   url: string;
-  element: string;
+  querySelector: string;
 }
 
 interface Product {
@@ -68,22 +69,7 @@ export default function ProductDetails({
           </Table.Head>
 
           {product.trackers.map(tracker => (
-            <Table.Row key={tracker.id}>
-              <Table.Cell>{tracker.url}</Table.Cell>
-              <Table.Cell>{tracker.element}</Table.Cell>
-              <Table.Cell>R$ 165,90</Table.Cell>
-              <Table.Cell>25/09/2022</Table.Cell>
-              <Table.Cell>
-                <div className='flex justify-end gap-1 items-center'>
-                  <Button variant='success' size='sm'>
-                    <BiScan size={16} />
-                  </Button>
-                  <Button variant='danger' size='sm'>
-                    <BiTrash size={16} />
-                  </Button>
-                </div>
-              </Table.Cell>
-            </Table.Row>
+            <TrackerRow key={tracker.id} tracker={tracker} />
           ))}
         </Table>
       </div>

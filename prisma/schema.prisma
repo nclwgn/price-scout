@@ -14,9 +14,18 @@ model Product {
 }
 
 model Tracker {
-  id        Int     @id @default(autoincrement())
-  url       String
-  element   String
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
+  id            Int           @id @default(autoincrement())
+  url           String
+  querySelector String
+  product       Product       @relation(fields: [productId], references: [id])
+  productId     Int
+  records       TrackRecord[]
+}
+
+model TrackRecord {
+  id        Int      @id @default(autoincrement())
+  price     Decimal
+  date      DateTime
+  tracker   Tracker  @relation(fields: [trackerId], references: [id])
+  trackerId Int
 }

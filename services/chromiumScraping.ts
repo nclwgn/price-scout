@@ -1,61 +1,31 @@
+import { Browser } from "puppeteer";
+
 interface ScrapeResult {
-  content?: string;
-  error?: {
-    code: 'browser-launch' | 'browser-navigation-error' | 'browser-closing-error';
-    reason?: any;
-  }
+  url: string;
+  content: string;
 }
 
-export const scrape = async (url: string): Promise<ScrapeResult> => {
-
+export const createBrowser = async (): Promise<Browser> => {
   const puppeteer = require('puppeteer');
 
-  let browser: any;
-  let page: any;
-  try {
-    browser = await puppeteer.launch({
-      headless: false,
-      args: ['--no-sandbox']
-    });
-    page = await browser.newPage();
-  }
-  catch (error: any) {
-    return {
-      error: {
-        code: 'browser-launch',
-        reason: error
-      }
-    };
-  }
+  return await puppeteer.launch({
+    headless: false,
+    args: ['--no-sandbox']
+  });
+}
 
-  try {
-    await page.goto(url);
-  }
-  catch (error: any) {
-    return {
-      error: {
-        code: 'browser-navigation-error',
-        reason: error
-      }
-    };
-  }
+export const scrapeSingle = async (browser: Browser, url: string): Promise<ScrapeResult> => {
+  const page = await browser.newPage();
 
+  await page.goto(url);
   const content = await page.content();
 
-  try {
-    await browser.close();
-  }
-  catch (error: any) {
-    console.log(error);
-    return {
-      error: {
-        code: 'browser-closing-error',
-        reason: error
-      }
-    };
-  }
-
   return {
+    url,
     content
   };
+}
+
+export const scrapeMultiple = async (browser: Browser, urls: string[]): Promise<ScrapeResult[]> => {
+  return await Promise.all(urls.map(url => scrapeSingle(browser, url)));
 }
