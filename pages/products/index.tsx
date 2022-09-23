@@ -24,6 +24,13 @@ export default function Products({
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  function onModalClose(shouldRefresh: boolean) {
+    if (shouldRefresh)
+      router.replace(router.asPath);
+
+    setIsModalOpen(false);
+  }
+
   return (
     <>
       <div className='container mx-auto'>
@@ -77,7 +84,7 @@ export default function Products({
 
       <NewProductModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={(shouldRefresh) => onModalClose(shouldRefresh)}
       />
     </>
   );

@@ -3,6 +3,7 @@ import { Modal } from "../../../components/Modal";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import { useEffect, useState } from "react";
 
 const schema = yup.object({
   name: yup.string()
@@ -11,12 +12,11 @@ const schema = yup.object({
 
 interface NewProductModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (shouldRefresh: boolean) => void;
 }
 
 interface NewProductFormData {
-  url: string;
-  querySelector: string;
+  name: string;
 }
 
 export function NewProductModal({
@@ -27,18 +27,40 @@ export function NewProductModal({
     resolver: yupResolver(schema)
   });
 
-  function onSubmit(data: NewProductFormData) {
-    console.log(data);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isServerError, setIsServerError] = useState(false);
+
+  async function onSubmit(data: NewProductFormData) {
+    setIsCreating(true);
+
+    try {
+      await fetch('/api/products', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: data.name
+        })
+      });
+
+      close(true);
+    }
+    catch (error) {
+      console.log(error);
+      setIsServerError(true);
+    }
+    finally {
+      setIsCreating(false);
+    }
   }
 
-  function onCloseModal() {
+  function close(shouldRefresh: boolean) {
     reset();
-    onClose();
+    setIsServerError(false);
+    onClose(shouldRefresh);
   }
 
   return (
     <Modal isOpen={isOpen}>
-      <Modal.Header onClose={onCloseModal}>
+      <Modal.Header onClose={() => close(false)}>
         Adicionar novo produto
       </Modal.Header>
       <Modal.Content>
@@ -54,11 +76,13 @@ export function NewProductModal({
             {!!errors.name && <p className='text-red-500 text-sm'>{errors.name.message}</p>}
           </div>
         </form>
+        {isServerError && <p className='text-red-500 text-sm'>Ocorreu um erro ao enviar os dados ao servidor</p>}
       </Modal.Content>
       <Modal.Buttons>
         <Button
           variant='secondary'
-          onClick={onCloseModal}
+          onClick={() => close(false)}
+          disabled={isCreating}
         >
           Cancelar
         </Button>
@@ -66,7 +90,14 @@ export function NewProductModal({
           type='submit'
           variant='success'
           onClick={handleSubmit(onSubmit)}
+          disabled={isCreating}
         >
+          {isCreating &&
+            <span className='flex'>
+              <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
+              <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
+            </span>
+          }
           Adicionar
         </Button>
       </Modal.Buttons>
