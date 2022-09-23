@@ -1,9 +1,10 @@
 import { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import { BiRadar, BiScan, BiTrash } from "react-icons/bi";
-import { Button } from "../../components/Button";
-import { Heading } from "../../components/Heading";
-import { Table } from "../../components/Table";
-import { prisma } from "../../services/prisma";
+import { Button } from "../../../components/Button";
+import { Heading } from "../../../components/Heading";
+import { Table } from "../../../components/Table";
+import { prisma } from "../../../services/prisma";
 
 interface Tracker {
   id: number;
@@ -24,6 +25,8 @@ interface ProductDetailsProps {
 export default function ProductDetails({
   product
 }: ProductDetailsProps) {
+  const router = useRouter();
+  
   return (
     <div className='container mx-auto'>
       <div className='flex justify-between items-end'>
@@ -39,7 +42,10 @@ export default function ProductDetails({
               <BiScan /> Rastrear todos agora
             </div>
           </Button>
-          <Button variant='success'>
+          <Button
+            variant='success'
+            onClick={() => router.push(`/products/${product.id}/trackers`)}
+          >
             <div className='flex items-center gap-1'>
               <BiRadar /> Adicionar rastreador
             </div>
@@ -88,7 +94,10 @@ export default function ProductDetails({
             <BiScan /> Rastrear todos agora
           </div>
         </Button>
-        <Button variant='success'>
+        <Button
+          variant='success'
+          onClick={() => router.push(`/products/${product.id}/trackers`)}
+        >
           <div className='flex items-center gap-1'>
             <BiRadar /> Adicionar rastreador
           </div>

@@ -1,11 +1,10 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { scrape as chromiumScrape } from '../../services/chromiumScraping';
 import { parse } from '../../utils/domParsing';
 
 interface TestUrlAndElementRequest {
   url: string;
-  element: string;
+  querySelector: string;
 }
 
 interface TestUrlAndElementResponse {
@@ -35,8 +34,8 @@ export default async function TestUrlAndElement(
   }
 
   // Checks required params
-  if (!content.element)
-    return res.status(400).send({ errorCode: 'element-required' });
+  if (!content.querySelector)
+    return res.status(400).send({ errorCode: 'query-selector-required' });
 
   if (!content.url)
     return res.status(400).send({ errorCode: 'url-required' });
@@ -52,7 +51,7 @@ export default async function TestUrlAndElement(
     return;
   }
 
-  const domParsing = parse(content.element, chromium.content);
+  const domParsing = parse(content.querySelector, chromium.content);
 
   if (domParsing.error || !domParsing.found) {
     res.status(400).json({

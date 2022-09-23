@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from '../../services/prisma';
+import { prisma } from '../../../services/prisma';
 
 interface CreateProductRequest {
   name: string;
