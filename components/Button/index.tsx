@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes } from "react";
 import cx from 'classnames';
+import { LoadingPing } from "../LoadingPing";
 
 type ButtonVariant = 'primary' | 'success' | 'danger' | 'secondary';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -7,6 +8,7 @@ type ButtonSize = 'sm' | 'md' | 'lg';
 interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className' | 'size'> {
   variant: ButtonVariant;
   size?: ButtonSize;
+  loading?: boolean
 }
 
 const variantUtility: Record<ButtonVariant, string> = {
@@ -25,6 +27,7 @@ const sizingUtility: Record<ButtonSize, string> = {
 export function Button({
   variant,
   size = 'md',
+  loading = false,
   children,
   ...rest
 }: ButtonProps) {
@@ -37,7 +40,10 @@ export function Button({
       )}
       {...rest}
     >
-      {children}
+      <div className='flex items-center gap-1'>
+        {loading && <LoadingPing size={3} variant={variant} />}
+        {children}
+      </div>
     </button>
   )
 }

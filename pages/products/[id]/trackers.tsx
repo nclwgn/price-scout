@@ -148,13 +148,8 @@ const Trackers = ({
             onClick={handleSubmit(onTestElementClick)}
             variant='primary'
             disabled={isTesting || isCreating}
+            loading={isTesting}
           >
-            {isTesting &&
-              <span className='flex'>
-                <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-blue-400 opacity-75'></span>
-                <span className='relative inline-flex h-3 w-3 rounded-full bg-blue-400'></span>
-              </span>
-            }
             Iniciar
           </Button>
 
@@ -175,13 +170,8 @@ const Trackers = ({
             disabled={!isValidTest || isCreating}
             size='lg'
             onClick={handleSubmit(onCreateClick)}
+            loading={isCreating}
           >
-            {isCreating &&
-              <span className='flex'>
-                <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
-                <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
-              </span>
-            }
             Concluir cadastro
           </Button>
 

@@ -91,13 +91,8 @@ export function NewProductModal({
           variant='success'
           onClick={handleSubmit(onSubmit)}
           disabled={isCreating}
+          loading={isCreating}
         >
-          {isCreating &&
-            <span className='flex'>
-              <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
-              <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
-            </span>
-          }
           Adicionar
         </Button>
       </Modal.Buttons>

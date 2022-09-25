@@ -60,14 +60,8 @@ export default function ProductDetails({
           </Heading>
         </div>
         <div className='flex gap-1'>
-          <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll}>
+          <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll} loading={isTrackingAll}>
             <div className='flex items-center gap-1'>
-              { isTrackingAll &&
-                <span className='flex'>
-                  <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
-                  <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
-                </span>
-              }
               <BiScan /> Rastrear todos agora
             </div>
           </Button>
@@ -103,14 +97,8 @@ export default function ProductDetails({
       </div>
 
       <div className='flex justify-end gap-1'>
-        <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll}>
+        <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll} loading={isTrackingAll}>
           <div className='flex items-center gap-1'>
-            { isTrackingAll &&
-              <span className='flex'>
-                <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
-                <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
-              </span>
-            }
             <BiScan /> Rastrear todos agora
           </div>
         </Button>

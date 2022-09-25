@@ -56,14 +56,8 @@ export function TrackerRow({
       </Table.Cell>
       <Table.Cell>
         <div className='flex justify-end gap-1 items-center'>
-          <Button variant='success' size='sm' onClick={() => onTrackSingle(tracker.id)}>
-            {isTracking ?
-              <span className='flex'>
-                <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
-                <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
-              </span> :
-              <BiScan size={16} />
-            }
+          <Button variant='success' size='sm' onClick={() => onTrackSingle(tracker.id)} loading={isTracking}>
+            <BiScan size={16} />
           </Button>
           <Button variant='danger' size='sm'>
             <BiTrash size={16} />
