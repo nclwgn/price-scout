@@ -24,7 +24,7 @@ const trackSingle = async (browser: Browser, tracker: Tracker) => {
 
   const parsedContent = parse(tracker.querySelector, scrapeResult.content);
 
-  const price = Number(parsedContent.found.toString().replace(/\s|(R\$)/g, '').replace(',', '.'));
+  const price = Number(parsedContent.found.toString().replace(/\s|(R\$)|\./g, '').replace(',', '.'));
 
   return prisma.trackRecord.create({
     data: {
