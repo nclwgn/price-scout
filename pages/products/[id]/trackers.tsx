@@ -8,6 +8,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { GetServerSideProps } from 'next';
 import { prisma } from '../../../services/prisma';
 import { useRouter } from 'next/router';
+import { PageHeading } from '../../../components/PageHeading';
 
 interface TrackersProps {
   product: {
@@ -100,85 +101,89 @@ const Trackers = ({
   }, [isDirty]);
 
   return (
-    <div className='container mx-auto grid grid-cols-2 gap-5'>
+    <div className='container mx-auto'>
+      <PageHeading>
+        <PageHeading.Title
+          title='Adicionar um novo rastreamento'
+          subTitle={product.id.toString()}
+          goBackTo={`/products/${product.id}`}
+        />
+      </PageHeading>
+      <div className='grid grid-cols-2 gap-5 mt-5'>
 
-      <section className='flex flex-col gap-5'>
+        <section className='flex flex-col gap-5'>
 
-        <div>
-          <Heading level={1}>Adicionar um novo rastreamento</Heading>
-          <p>em {product.name}</p>
-        </div>
-
-        <div className='flex flex-col gap-1'>
-          <p>
-            URL
-          </p>
-          <input 
-            type='text'
-            className='w-full text-xl text-center'
-            disabled={isTesting || isCreating}
-            {...register('url')}
-          />
-          {!!errors.url && <p className='text-sm text-red-500'>{errors.url.message}</p>}
-        </div>
-
-        <div className='flex flex-col gap-1'>
-          <p>
-            Seletor de query
-          </p>
-          <input 
-            type='text'
-            className='w-full text-xl text-center'
-            disabled={isTesting || isCreating}
-            {...register('querySelector')}
-          />
-          {!!errors.querySelector && <p className='text-sm text-red-500'>{errors.querySelector.message}</p>}
-        </div>
-
-      </section>
-
-      <section>
-
-        <div className='rounded-lg bg-gray-800 p-5 flex flex-col gap-y-5'>
-          <Heading level={2}>
-            Teste de rastreamento
-          </Heading>
-
-          <Button
-            onClick={handleSubmit(onTestElementClick)}
-            variant='primary'
-            disabled={isTesting || isCreating}
-            loading={isTesting}
-          >
-            Iniciar
-          </Button>
-
-          <div className='flex gap-5'>
-            <p>Resultados do teste </p>
-            {isValidTest && <Badge type='success'>Teste válido</Badge>}
+          <div className='flex flex-col gap-1'>
+            <p>
+              URL
+            </p>
+            <input 
+              type='text'
+              className='w-full text-xl text-center'
+              disabled={isTesting || isCreating}
+              {...register('url')}
+            />
+            {!!errors.url && <p className='text-sm text-red-500'>{errors.url.message}</p>}
           </div>
 
-          <p className='text-xs text-center'>
-            {foundContentResponse}
-          </p>
-        </div>
+          <div className='flex flex-col gap-1'>
+            <p>
+              Seletor de query
+            </p>
+            <input 
+              type='text'
+              className='w-full text-xl text-center'
+              disabled={isTesting || isCreating}
+              {...register('querySelector')}
+            />
+            {!!errors.querySelector && <p className='text-sm text-red-500'>{errors.querySelector.message}</p>}
+          </div>
 
-        <div className='flex mt-5 justify-end'>
+        </section>
 
-          <Button 
-            variant='success'
-            disabled={!isValidTest || isCreating}
-            size='lg'
-            onClick={handleSubmit(onCreateClick)}
-            loading={isCreating}
-          >
-            Concluir cadastro
-          </Button>
+        <section>
 
-        </div>
+          <div className='rounded-lg bg-gray-800 p-5 flex flex-col gap-y-5'>
+            <Heading level={2}>
+              Teste de rastreamento
+            </Heading>
 
-      </section>
-      
+            <Button
+              onClick={handleSubmit(onTestElementClick)}
+              variant='primary'
+              disabled={isTesting || isCreating}
+              loading={isTesting}
+            >
+              Iniciar
+            </Button>
+
+            <div className='flex gap-5'>
+              <p>Resultados do teste </p>
+              {isValidTest && <Badge type='success'>Teste válido</Badge>}
+            </div>
+
+            <p className='text-xs text-center'>
+              {foundContentResponse}
+            </p>
+          </div>
+
+          <div className='flex mt-5 justify-end'>
+
+            <Button 
+              variant='success'
+              disabled={!isValidTest || isCreating}
+              size='lg'
+              onClick={handleSubmit(onCreateClick)}
+              loading={isCreating}
+            >
+              Concluir cadastro
+            </Button>
+
+          </div>
+
+        </section>
+        
+      </div>
     </div>
   )
 }

@@ -1,9 +1,9 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { BiArrowBack, BiRadar, BiScan } from "react-icons/bi";
+import { BiRadar, BiScan } from "react-icons/bi";
 import { Button } from "../../../components/Button";
-import { Heading } from "../../../components/Heading";
+import { PageHeading } from "../../../components/PageHeading";
 import { Table } from "../../../components/Table";
 import { prisma } from "../../../services/prisma";
 import { TrackerRow } from "./components/TrackerRow";
@@ -52,32 +52,29 @@ export default function ProductDetails({
   
   return (
     <div className='container mx-auto'>
-      <div className='flex justify-between items-end'>
-        <div className='flex gap-3 items-center'>
-          <BiArrowBack className='cursor-pointer' size={24} onClick={() => router.push('/products')} />
-          <div>
-            <Heading level={1}>Produto</Heading>
-            <Heading level={2}>
-              {product.name}
-            </Heading>
-          </div>
-        </div>
-        <div className='flex gap-1'>
-          <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll} loading={isTrackingAll}>
-            <div className='flex items-center gap-1'>
-              <BiScan /> Rastrear todos agora
-            </div>
+      <PageHeading>
+        <PageHeading.Title
+          title='Produto'
+          subTitle={product.name}
+          goBackTo='/products'
+        />
+        <PageHeading.Buttons>
+          <Button
+            variant='success'
+            onClick={onTrackAll}
+            disabled={isTrackingAll}
+            loading={isTrackingAll}
+          >
+            <BiScan /> Rastrear todos agora
           </Button>
           <Button
             variant='success'
             onClick={() => router.push(`/products/${product.id}/trackers`)}
           >
-            <div className='flex items-center gap-1'>
-              <BiRadar /> Adicionar rastreador
-            </div>
+            <BiRadar /> Adicionar rastreador
           </Button>
-        </div>
-      </div>
+        </PageHeading.Buttons>
+      </PageHeading>
 
       <div className='mt-5 font-bold uppercase w-100'>
         Rastreadores
@@ -99,19 +96,20 @@ export default function ProductDetails({
         </Table>
       </div>
 
-      <div className='flex justify-end gap-1'>
-        <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll} loading={isTrackingAll}>
-          <div className='flex items-center gap-1'>
-            <BiScan /> Rastrear todos agora
-          </div>
+      <div className='flex justify-end gap-3'>
+        <Button
+          variant='success'
+          onClick={onTrackAll}
+          disabled={isTrackingAll}
+          loading={isTrackingAll}
+        >
+          <BiScan /> Rastrear todos agora
         </Button>
         <Button
           variant='success'
           onClick={() => router.push(`/products/${product.id}/trackers`)}
         >
-          <div className='flex items-center gap-1'>
-            <BiRadar /> Adicionar rastreador
-          </div>
+          <BiRadar /> Adicionar rastreador
         </Button>
       </div>
     </div>

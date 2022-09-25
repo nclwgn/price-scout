@@ -7,6 +7,7 @@ import { BiPlus, BiRadar, BiScan, BiTrash } from "react-icons/bi";
 import { useRouter } from "next/router";
 import { NewProductModal } from "./components/NewProductModal";
 import { useState } from "react";
+import { PageHeading } from "../../components/PageHeading";
 
 interface Product {
   id: number;
@@ -34,14 +35,14 @@ export default function Products({
   return (
     <>
       <div className='container mx-auto'>
-        <div className='flex justify-between'>
-          <Heading level={1}>Listagem de produtos</Heading>
-          <Button variant='success'>
-            <div className='flex items-center gap-1' onClick={() => setIsModalOpen(true)}>
+        <PageHeading>
+          <PageHeading.Title title='Listagem de produtos' />
+          <PageHeading.Buttons>
+            <Button variant='success' onClick={() => setIsModalOpen(true)}>
               <BiPlus /> Adicionar produto
-            </div>
-          </Button>
-        </div>
+            </Button>
+          </PageHeading.Buttons>
+        </PageHeading>
 
         <div className='my-5'>
           <Table>
@@ -75,9 +76,7 @@ export default function Products({
 
         <div className='flex justify-end'>
           <Button variant='success' onClick={() => setIsModalOpen(true)}>
-            <div className='flex items-center gap-1'>
-              <BiPlus /> Adicionar produto
-            </div>
+            <BiPlus /> Adicionar produto
           </Button>
         </div>
       </div>
