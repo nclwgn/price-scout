@@ -1,5 +1,6 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
+import { useState } from "react";
 import { BiRadar, BiScan, BiTrash } from "react-icons/bi";
 import { Button } from "../../../components/Button";
 import { Heading } from "../../../components/Heading";
@@ -11,6 +12,8 @@ interface Tracker {
   id: number;
   url: string;
   querySelector: string;
+  lastPrice?: number;
+  lastTracked?: string;
 }
 
 interface Product {
@@ -27,6 +30,25 @@ export default function ProductDetails({
   product
 }: ProductDetailsProps) {
   const router = useRouter();
+  const [isTrackingAll, setIsTrackingAll] = useState(false);
+
+  async function onTrackAll() {
+    setIsTrackingAll(true);
+
+    try {
+      await fetch(`/api/products/${product.id}/track`, {
+        method: 'POST'
+      });
+
+      router.replace(router.asPath);
+    }
+    catch (error) {
+      console.log(error);
+    }
+    finally {
+      setIsTrackingAll(false);
+    }
+  }
   
   return (
     <div className='container mx-auto'>
@@ -38,8 +60,14 @@ export default function ProductDetails({
           </Heading>
         </div>
         <div className='flex gap-1'>
-          <Button variant='success'>
+          <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll}>
             <div className='flex items-center gap-1'>
+              { isTrackingAll &&
+                <span className='flex'>
+                  <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
+                  <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
+                </span>
+              }
               <BiScan /> Rastrear todos agora
             </div>
           </Button>
@@ -63,7 +91,7 @@ export default function ProductDetails({
           <Table.Head>
             <Table.Cell>URL</Table.Cell>
             <Table.Cell>Elemento</Table.Cell>
-            <Table.Cell>Melhor preço</Table.Cell>
+            <Table.Cell>Último preço</Table.Cell>
             <Table.Cell>Última verificação</Table.Cell>
             <Table.Cell />
           </Table.Head>
@@ -75,8 +103,14 @@ export default function ProductDetails({
       </div>
 
       <div className='flex justify-end gap-1'>
-        <Button variant='success'>
+        <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll}>
           <div className='flex items-center gap-1'>
+            { isTrackingAll &&
+              <span className='flex'>
+                <span className='animate-ping absolute inline-flex h-3 w-3 rounded-full bg-green-400 opacity-75'></span>
+                <span className='relative inline-flex h-3 w-3 rounded-full bg-green-400'></span>
+              </span>
+            }
             <BiScan /> Rastrear todos agora
           </div>
         </Button>
@@ -99,7 +133,19 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   const product = await prisma.product.findUnique({
     where: { id },
     include: {
-      trackers: true
+      trackers: {
+        select: {
+          id: true,
+          url: true,
+          querySelector: true,
+          records: {
+            orderBy: {
+              date: 'desc'
+            },
+            take: 1
+          }
+        }
+      }
     }
   });
 
@@ -117,7 +163,13 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
       product: {
         id: product.id,
         name: product.name,
-        trackers: product.trackers
+        trackers: product.trackers.map(tracker => ({
+          id: tracker.id,
+          url: tracker.url,
+          querySelector: tracker.querySelector,
+          lastPrice: Number(tracker.records[0]?.price),
+          lastTracked: tracker.records[0]?.date.toISOString() ?? null
+        }))
       }
     }
   };

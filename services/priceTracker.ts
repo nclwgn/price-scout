@@ -34,3 +34,13 @@ const trackSingle = async (browser: Browser, tracker: Tracker) => {
     }
   })
 }
+
+export const testTrack = async (url: string, querySelector: string) => {
+  const browser = await createBrowser();
+
+  const scrapeResult = await scrapeSingle(browser, url);
+
+  await browser.close();
+
+  return parse(querySelector, scrapeResult.content);
+}

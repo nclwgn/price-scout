@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { scrape as chromiumScrape } from '../../services/chromiumScraping';
+import { testTrack } from '../../services/priceTracker';
 import { parse } from '../../utils/domParsing';
 
 interface TestUrlAndElementRequest {
@@ -40,29 +41,10 @@ export default async function TestUrlAndElement(
   if (!content.url)
     return res.status(400).send({ errorCode: 'url-required' });
 
-  // Tries to get the content via Chromium
-  const chromium = await chromiumScrape(content.url);
-
-  if (chromium.error || !chromium.content) {
-    res.status(400).json({
-      errorCode: chromium.error?.code ?? '',
-      reason: chromium.error?.reason
-    });
-    return;
-  }
-
-  const domParsing = parse(content.querySelector, chromium.content);
-
-  if (domParsing.error || !domParsing.found) {
-    res.status(400).json({
-      errorCode: domParsing.error?.code ?? '',
-      reason: domParsing.error?.reason
-    });
-    return;
-  }
+  const scrapeResult = await testTrack(content.url, content.querySelector);
 
   res.status(200).json({
-    foundContent: domParsing.found
+    foundContent: scrapeResult.found
   });
   
 }

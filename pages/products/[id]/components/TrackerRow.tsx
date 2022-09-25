@@ -7,6 +7,8 @@ interface Tracker {
   id: number;
   url: string;
   querySelector: string;
+  lastPrice?: number;
+  lastTracked?: string;
 }
 
 interface TrackerRowProps {
@@ -42,8 +44,16 @@ export function TrackerRow({
     <Table.Row>
       <Table.Cell>{tracker.url}</Table.Cell>
       <Table.Cell>{tracker.querySelector}</Table.Cell>
-      <Table.Cell>R$ 165,90</Table.Cell>
-      <Table.Cell>25/09/2022</Table.Cell>
+      <Table.Cell>
+        {tracker.lastPrice ?
+        'R$ ' + tracker.lastPrice?.toLocaleString('pt-BR', {minimumFractionDigits: 2}) :
+        '--'}
+      </Table.Cell>
+      <Table.Cell>
+        {tracker.lastTracked ?
+        new Date(tracker.lastTracked).toLocaleDateString() :
+        '--'}
+      </Table.Cell>
       <Table.Cell>
         <div className='flex justify-end gap-1 items-center'>
           <Button variant='success' size='sm' onClick={() => onTrackSingle(tracker.id)}>

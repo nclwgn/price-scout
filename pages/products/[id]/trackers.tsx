@@ -57,10 +57,9 @@ const Trackers = ({
       if (response.status === 200) {
         const body = await response.json();
   
-        const returnContent = body.foundContent.toString().replace(/\s|(R\$)/g, '').replace(',', '.');
-        setFoundContentResponse(returnContent);
+        setFoundContentResponse(body.foundContent);
+        const foundNumber = Number(body.foundContent.toString().replace(/\s|(R\$)/g, '').replace(',', '.'));
 
-        const foundNumber = Number(returnContent);
         if (foundNumber) {
           setIsValidTest(true);
         }
