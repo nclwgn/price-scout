@@ -9,6 +9,7 @@ import { GetServerSideProps } from 'next';
 import { prisma } from '../../../services/prisma';
 import { useRouter } from 'next/router';
 import { PageHeading } from '../../../components/PageHeading';
+import { BiRadar } from 'react-icons/bi';
 
 interface TrackersProps {
   product: {
@@ -109,16 +110,21 @@ const Trackers = ({
           goBackTo={`/products/${product.id}`}
         />
       </PageHeading>
-      <div className='grid grid-cols-2 gap-5 mt-5'>
 
+      <div className='flex flex-col gap-5 mt-5'>
+        
         <section className='flex flex-col gap-5'>
+
+          <Heading level={2}>
+            1. Insira os dados do produto a ser rastreado
+          </Heading>
 
           <div className='flex flex-col gap-1'>
             <p>
               URL
             </p>
             <input 
-              type='text'
+              type='text' 
               className='w-full text-xl text-center'
               disabled={isTesting || isCreating}
               {...register('url')}
@@ -139,51 +145,58 @@ const Trackers = ({
             {!!errors.querySelector && <p className='text-sm text-red-500'>{errors.querySelector.message}</p>}
           </div>
 
-        </section>
-
-        <section>
-
-          <div className='rounded-lg bg-gray-800 p-5 flex flex-col gap-y-5'>
-            <Heading level={2}>
-              Teste de rastreamento
-            </Heading>
-
+          <div className='flex justify-end'>
             <Button
               onClick={handleSubmit(onTestElementClick)}
               variant='primary'
               disabled={isTesting || isCreating}
               loading={isTesting}
             >
-              Iniciar
+              <BiRadar />
+              Iniciar teste de rastreamento
             </Button>
-
-            <div className='flex gap-5'>
-              <p>Resultados do teste </p>
-              {isValidTest && <Badge type='success'>Teste válido</Badge>}
-            </div>
-
-            <p className='text-xs text-center'>
-              {foundContentResponse}
-            </p>
           </div>
 
-          <div className='flex mt-5 justify-end'>
+        </section>
 
-            <Button 
-              variant='success'
-              disabled={!isValidTest || isCreating}
-              size='lg'
-              onClick={handleSubmit(onCreateClick)}
-              loading={isCreating}
-            >
-              Concluir cadastro
-            </Button>
+        <section className='flex flex-col gap-5'>
+
+          <Heading level={2}>
+            2. Verifique os dados obtidos do rastreamento
+          </Heading>
+
+          <div className='rounded-lg p-5 flex justify-between border-dotted border-gray-500 border-2'>
+
+            <p>
+              <span className='font-bold'>Resultados do teste: </span>
+              {foundContentResponse}
+            </p>
+            {isValidTest && <Badge type='success'>Teste válido</Badge>}
 
           </div>
 
         </section>
-        
+
+        <section className='flex justify-between'>
+
+          <Heading level={2}>
+            3. Conclua o cadastro
+          </Heading>
+
+          <Button 
+            variant='success'
+            disabled={!isValidTest || isCreating}
+            size='lg'
+            onClick={handleSubmit(onCreateClick)}
+            loading={isCreating}
+          >
+            Concluir cadastro
+          </Button>
+
+        </section>
+
       </div>
+        
     </div>
   )
 }
