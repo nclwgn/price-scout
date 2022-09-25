@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { BiRadar, BiScan, BiTrash } from "react-icons/bi";
+import { BiArrowBack, BiRadar, BiScan } from "react-icons/bi";
 import { Button } from "../../../components/Button";
 import { Heading } from "../../../components/Heading";
 import { Table } from "../../../components/Table";
@@ -53,11 +53,14 @@ export default function ProductDetails({
   return (
     <div className='container mx-auto'>
       <div className='flex justify-between items-end'>
-        <div>
-          <Heading level={1}>Produto</Heading>
-          <Heading level={2}>
-            {product.name}
-          </Heading>
+        <div className='flex gap-3 items-center'>
+          <BiArrowBack className='cursor-pointer' size={24} onClick={() => router.push('/products')} />
+          <div>
+            <Heading level={1}>Produto</Heading>
+            <Heading level={2}>
+              {product.name}
+            </Heading>
+          </div>
         </div>
         <div className='flex gap-1'>
           <Button variant='success' onClick={onTrackAll} disabled={isTrackingAll} loading={isTrackingAll}>
