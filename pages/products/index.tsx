@@ -1,6 +1,5 @@
 import { GetServerSidePropsResult } from "next";
 import { Button } from "../../components/Button";
-import { Heading } from "../../components/Heading";
 import { Table } from "../../components/Table";
 import { prisma } from "../../services/prisma";
 import { BiPlus, BiRadar, BiScan, BiTrash } from "react-icons/bi";
