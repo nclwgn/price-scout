@@ -8,7 +8,7 @@ interface TrackSingleResponse {
 
 interface TrackSingleErrorResponse {
   errorCode: string;
-  reason?: string;
+  reason?: any;
 }
 
 export default async function TrackSingle(
@@ -34,8 +34,17 @@ export default async function TrackSingle(
 
   const trackRecords = await track([tracker]);
 
-  res.status(200).json({
-    price: Number(trackRecords[0]?.price)
+  console.log(JSON.stringify(trackRecords, undefined, 2))
+
+  if (trackRecords.errors.length > 0) {
+    return res.status(400).json({
+      errorCode: 'tracking-error',
+      reason: trackRecords.errors[0]
+    });
+  }
+
+  return res.status(200).json({
+    price: Number(trackRecords.trackRecords[0]?.price)
   });
   
 }

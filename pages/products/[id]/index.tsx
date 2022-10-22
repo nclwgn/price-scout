@@ -31,14 +31,25 @@ export default function ProductDetails({
 }: ProductDetailsProps) {
   const router = useRouter();
   const [isTrackingAll, setIsTrackingAll] = useState(false);
+  const [invalidTrackers, setInvalidTrackers] = useState<number[]>([]);
 
   async function onTrackAll() {
     setIsTrackingAll(true);
 
     try {
-      await fetch(`/api/products/${product.id}/track`, {
+      const response = await fetch(`/api/products/${product.id}/track`, {
         method: 'POST'
       });
+
+      if (response.status !== 200) {
+        const body = await response.json();
+        if (body.reason) {
+          setInvalidTrackers(body.reason.map((error: {id: number}) => error.id));
+        }
+      }
+      else {
+        setInvalidTrackers([]);
+      }
 
       router.replace(router.asPath);
     }
@@ -47,6 +58,15 @@ export default function ProductDetails({
     }
     finally {
       setIsTrackingAll(false);
+    }
+  }
+
+  function onTrackSingle(id: number, result: boolean) {
+    if (result) {
+      setInvalidTrackers([...invalidTrackers.filter(invalidId => invalidId !== id)]);
+    }
+    else if (!invalidTrackers.some(invalidId => invalidId === id)) {
+      setInvalidTrackers([...invalidTrackers, id]);
     }
   }
   
@@ -91,7 +111,12 @@ export default function ProductDetails({
           </Table.Head>
 
           {product.trackers.map(tracker => (
-            <TrackerRow key={tracker.id} tracker={tracker} />
+            <TrackerRow
+              key={tracker.id}
+              tracker={tracker}
+              invalid={invalidTrackers.some(id => id === tracker.id)}
+              onTrackSingleResult={result => onTrackSingle(tracker.id, result)}
+            />
           ))}
         </Table>
       </div>

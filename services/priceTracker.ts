@@ -1,3 +1,4 @@
+import { TrackRecord } from "@prisma/client";
 import { Browser } from "puppeteer";
 import { parse } from "../utils/domParsing";
 import { createBrowser, scrapeSingle } from "./chromiumScraping"
@@ -9,30 +10,55 @@ interface Tracker {
   querySelector: string;
 }
 
-export const track = async (trackers: Tracker[]) => {
+interface TrackMultipleResult {
+  trackRecords: TrackRecord[];
+  errors: Error[];
+}
+
+const isFulfilled = (promise: PromiseSettledResult<TrackRecord>): promise is PromiseFulfilledResult<TrackRecord> =>
+  promise.status === 'fulfilled';
+
+const isRejected = (promise: PromiseSettledResult<unknown>): promise is PromiseRejectedResult =>
+  promise.status === 'rejected';
+
+export const track = async (trackers: Tracker[]): Promise<TrackMultipleResult> => {
   const browser = await createBrowser();
 
-  const trackRecords = await Promise.all(trackers.map(tracker => trackSingle(browser, tracker)));
+  const trackRecords = await Promise.allSettled(trackers.map(tracker => trackSingle(browser, tracker)));
 
   await browser.close();
 
-  return trackRecords;
+  return {
+    trackRecords: trackRecords.filter(isFulfilled).map(fulfilled => fulfilled.value),
+    errors: trackRecords.filter(isRejected).map(rejected => rejected.reason)
+  };
 }
 
 const trackSingle = async (browser: Browser, tracker: Tracker) => {
-  const scrapeResult = await scrapeSingle(browser, tracker.url);
+  try {
+    const scrapeResult = await scrapeSingle(browser, tracker.url);
+    
+    const parsedContent = parse(tracker.querySelector, scrapeResult.content);
+    
+    const price = Number(parsedContent.found.toString().replace(/\s|(R\$)|\./g, '').replace(',', '.'));
 
-  const parsedContent = parse(tracker.querySelector, scrapeResult.content);
+    if (!price || isNaN(price))
+      throw new Error('Price content not found');
 
-  const price = Number(parsedContent.found.toString().replace(/\s|(R\$)|\./g, '').replace(',', '.'));
-
-  return prisma.trackRecord.create({
-    data: {
-      date: new Date(),
-      price,
-      trackerId: tracker.id
-    }
-  })
+    return await prisma.trackRecord.create({
+      data: {
+        date: new Date(),
+        price,
+        trackerId: tracker.id
+      }
+    });
+  }
+  catch (err) {
+    throw {
+      id: tracker.id,
+      error: err
+    };
+  }
 }
 
 export const testTrack = async (url: string, querySelector: string) => {

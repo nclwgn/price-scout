@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BiScan, BiTrash } from "react-icons/bi";
+import { BiErrorCircle, BiScan, BiTrash } from "react-icons/bi";
 import { Button } from "../../../../components/Button";
 import { Table } from "../../../../components/Table";
 
@@ -13,10 +13,14 @@ interface Tracker {
 
 interface TrackerRowProps {
   tracker: Tracker;
+  invalid?: boolean;
+  onTrackSingleResult: (result: boolean) => void;
 }
 
 export function TrackerRow({
-  tracker
+  tracker,
+  invalid = false,
+  onTrackSingleResult
 }: TrackerRowProps) {
   const [isTracking, setIsTracking] = useState(false);
 
@@ -28,9 +32,7 @@ export function TrackerRow({
         method: 'POST'
       });
 
-      if (response.status === 200) {
-        console.log(await response.json());
-      }
+      onTrackSingleResult(response.status === 200);
     }
     catch (error) {
       console.log(error);
@@ -56,6 +58,7 @@ export function TrackerRow({
       </Table.Cell>
       <Table.Cell>
         <div className='flex justify-end gap-1 items-center'>
+          {invalid && <BiErrorCircle size={20} className='fill-red-600' />}
           <Button variant='success' size='sm' onClick={() => onTrackSingle(tracker.id)} loading={isTracking}>
             <BiScan size={16} />
           </Button>

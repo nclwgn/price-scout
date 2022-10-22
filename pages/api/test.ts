@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { scrape as chromiumScrape } from '../../services/chromiumScraping';
 import { testTrack } from '../../services/priceTracker';
-import { parse } from '../../utils/domParsing';
 
 interface TestUrlAndElementRequest {
   url: string;

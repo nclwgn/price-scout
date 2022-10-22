@@ -8,7 +8,7 @@ interface TrackMultipleResponse {
 
 interface TrackMultipleErrorResponse {
   errorCode: string;
-  reason?: string;
+  reason?: any;
 }
 
 export default async function TrackMultiple(
@@ -32,7 +32,14 @@ export default async function TrackMultiple(
     return res.status(400).json({ errorCode: 'tracker-not-found' });
   }
 
-  await track(tracker);
+  let result = await track(tracker);
+
+  if (result.errors.length > 0) {
+    return res.status(400).json({
+      errorCode: 'tracking-error',
+      reason: result.errors
+    });
+  }
 
   res.status(200).end();
   
