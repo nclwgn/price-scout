@@ -41,7 +41,7 @@ export function Button({
       {...rest}
     >
       <div className='flex items-center gap-1'>
-        {loading && <LoadingPing size={3} variant={variant} />}
+        {loading && <LoadingPing size={3} />}
         {children}
       </div>
     </button>
