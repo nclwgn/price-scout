@@ -1,12 +1,18 @@
 import { GetServerSideProps } from "next";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { BiRadar, BiScan } from "react-icons/bi";
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Button } from "../../../components/Button";
 import { PageHeading } from "../../../components/PageHeading";
 import { Table } from "../../../components/Table";
 import { prisma } from "../../../services/prisma";
 import { TrackerRow } from "./components/TrackerRow";
+
+interface TrackRecord {
+  date: string;
+  price: number;
+}
 
 interface Tracker {
   id: number;
@@ -14,6 +20,7 @@ interface Tracker {
   querySelector: string;
   lastPrice?: number;
   lastTracked?: string;
+  records: TrackRecord[];
 }
 
 interface Product {
@@ -69,6 +76,29 @@ export default function ProductDetails({
       setInvalidTrackers([...invalidTrackers, id]);
     }
   }
+
+  const mapDates = useCallback((product: Product) => {
+    let output: any[] = [];
+
+    for (const tracker of product.trackers) {
+      for (const record of tracker.records) {
+        let foundDate = output.find((chartDate: any) => chartDate.localeDate === new Date(record.date).toLocaleDateString());
+        
+        if (!foundDate) {
+          output.push({
+            localeDate: new Date(record.date).toLocaleDateString(),
+            date: new Date(record.date),
+            [tracker.id]: record.price
+          });
+        }
+        else {
+          foundDate[tracker.id] = record.price;
+        }
+      }
+    }
+
+      return output.sort((a, b) => a.date - b.date);
+  }, [product]);
   
   return (
     <div className='container mx-auto'>
@@ -97,12 +127,30 @@ export default function ProductDetails({
       </PageHeading>
 
       <div className='mt-5 font-bold uppercase w-100'>
+        Tendência
+      </div>
+
+      <div className='bg-gray-800 rounded-lg p-5 mt-5'>
+        <ResponsiveContainer width='100%' aspect={5}>
+          <LineChart data={mapDates(product)}>
+            <XAxis dataKey='localeDate' stroke='lightGray'/>
+            <YAxis stroke='lightGray' />
+            <Tooltip />
+            {product.trackers.map(tracker => (
+              <Line type='monotone' dataKey={tracker.id} key={tracker.id} />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className='mt-5 font-bold uppercase w-100'>
         Rastreadores
       </div>
 
       <div className='my-5'>
         <Table>
           <Table.Head>
+            <Table.Cell>#</Table.Cell>
             <Table.Cell>URL</Table.Cell>
             <Table.Cell>Elemento</Table.Cell>
             <Table.Cell>Último preço</Table.Cell>
@@ -156,7 +204,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
             orderBy: {
               date: 'desc'
             },
-            take: 1
+            where: {
+              date: {
+                gte: new Date((new Date()).getDate() - 60)
+              }
+            }
           }
         }
       }
@@ -182,7 +234,11 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
           url: tracker.url,
           querySelector: tracker.querySelector,
           lastPrice: Number(tracker.records[0]?.price),
-          lastTracked: tracker.records[0]?.date.toISOString() ?? null
+          lastTracked: tracker.records[0]?.date.toISOString() ?? null,
+          records: tracker.records.map(record => ({
+            date: record.date.toISOString(),
+            price: Number(record.price)
+          }))
         }))
       }
     }

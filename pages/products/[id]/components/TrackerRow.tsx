@@ -44,6 +44,7 @@ export function TrackerRow({
 
   return (
     <Table.Row>
+      <Table.Cell>{tracker.id}</Table.Cell>
       <Table.Cell>{tracker.url}</Table.Cell>
       <Table.Cell>{tracker.querySelector}</Table.Cell>
       <Table.Cell>
