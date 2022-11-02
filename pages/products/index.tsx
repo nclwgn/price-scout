@@ -7,24 +7,19 @@ import { useRouter } from "next/router";
 import { NewProductModal } from "./components/NewProductModal";
 import { useState } from "react";
 import { PageHeading } from "../../components/PageHeading";
-import { Prisma } from "@prisma/client";
+import { IncreaseBadge } from "../../components/IncreaseBadge";
 
 interface Product {
   id: number;
   name: string;
   trackerCount: number;
   lastTracked: string | null;
-  lowestPrice?: number | null;
+  lowestPrice: number | null;
+  priceIncrease: number | null;
 }
 
 interface ProductsProps {
   products: Product[];
-}
-
-interface RecordData {
-  id: number;
-  lastTracked: BigInt;
-  lowestPrice: number;
 }
 
 export default function Products({
@@ -66,8 +61,15 @@ export default function Products({
               <Table.Row key={product.id}>
                 <Table.Cell>{product.name}</Table.Cell>
                 <Table.Cell>{product.trackerCount}</Table.Cell>
-                <Table.Cell>{product.lastTracked}</Table.Cell>
-                <Table.Cell>{product.lowestPrice}</Table.Cell>
+                <Table.Cell>{!!product.lastTracked ? new Date(product.lastTracked).toLocaleDateString() : ''}</Table.Cell>
+                <Table.Cell>
+                  <span className='inline-flex gap-1 items-center'>
+                    {!!product.lowestPrice && `R$ ${product.lowestPrice.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`}
+                    {(!!product.priceIncrease || product.priceIncrease === 0) &&
+                      <IncreaseBadge percentage={product.priceIncrease} />
+                    }
+                  </span>
+                </Table.Cell>
                 <Table.Cell>
                   <div className='flex justify-end gap-1 items-center'>
                     <Button variant='success' size='sm'>
@@ -107,12 +109,13 @@ export async function getServerSideProps(): Promise<GetServerSidePropsResult<Pro
       trackers: {
         include: {
           records: {
-            take: 1,
+            where: {
+              date: {
+                gte: new Date((new Date()).getDate() - 5)
+              }
+            },
             orderBy: {
               date: 'desc'
-            },
-            select: {
-              date: true
             }
           }
         }
@@ -125,33 +128,60 @@ export async function getServerSideProps(): Promise<GetServerSidePropsResult<Pro
     }
   });
 
-  const recordData = await prisma.$queryRaw<any[]>`
-    SELECT
-      t1.id,
-      max(t3.date) AS lastTracked,
-      min(t3.price) AS lowestPrice
-    FROM Product t1
-      JOIN Tracker t2 ON t2.productId = t1.id
-      JOIN TrackRecord t3 ON t3.trackerId = t2.id
-    WHERE t1.id IN (${Prisma.join(products.map(product => product.id))})
-      AND t3.date >= (
-        SELECT max(s0.date) FROM TrackRecord s0 JOIN Tracker s1 ON s1.id = s0.trackerId WHERE s1.productId = t1.id
-      )
-    GROUP BY t1.id
-  `;
-
   return {
     props: {
-      products: products.map(p => {
-        const record = recordData.find(record => record.id === p.id);
+      products: products.map(product => {
+        let output: Product = {
+          id: product.id,
+          name: product.name,
+          trackerCount: product._count.trackers,
+          lastTracked: null,
+          lowestPrice: null,
+          priceIncrease: null
+        };
 
-        return {
-          id: p.id,
-          name: p.name,
-          trackerCount: p._count.trackers,
-          lastTracked: record !== undefined ? new Date(record.lastTracked).toISOString() : null,
-          lowestPrice: record?.lowestPrice ?? null
+        const records = product.trackers
+          .map(tracker => tracker.records)
+          .reduce((a, b) => a.concat(b), []);
+
+        if (records.length > 0) {
+          // Gets all tracked dates in timestamp and selects the most recent one
+          const recordsWithTimestamp = records.map(record => {
+            const date = record.date;
+            date.setHours(0, 0, 0, 0);
+
+            return {
+              ...record,
+              timestamp: date.getTime()
+            };
+          });
+          const lastTrackedTimestamp = Math.max(...recordsWithTimestamp.map(record => record.timestamp));
+          const lastTrackedDate = new Date();
+          lastTrackedDate.setTime(lastTrackedTimestamp);
+
+          output.lastTracked = lastTrackedDate.toISOString();
+  
+          // Between the most recent, gets the lowest price
+          const lastTrackedDateRecords = recordsWithTimestamp.filter(record => record.timestamp === lastTrackedTimestamp);
+          const lowestPrice = Math.min(...lastTrackedDateRecords.map(record => Number(record.price)));
+
+          output.lowestPrice = lowestPrice;
+  
+          // Gets the last date before the most recent
+          const nonLastTrackedRecords = recordsWithTimestamp.filter(record => record.timestamp !== lastTrackedTimestamp);
+          
+          if (nonLastTrackedRecords.length > 0) {
+            const increaseComparisonTimestamp = Math.max(...nonLastTrackedRecords.map(record => record.timestamp));
+            const increaseComparisonLowestPrice = Math.min(...records.filter(record => record.date.getTime() === increaseComparisonTimestamp).map(record => Number(record.price)));
+            const priceIncrease = (lowestPrice / increaseComparisonLowestPrice) - 1;
+
+            if (product.id === 21) console.log(lowestPrice, '/', increaseComparisonLowestPrice, '=', priceIncrease)
+
+            output.priceIncrease = priceIncrease;
+          }
         }
+
+        return output;
       })
     }
   };
