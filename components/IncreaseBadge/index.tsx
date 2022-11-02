@@ -24,7 +24,7 @@ export function IncreaseBadge({
         <BiMinus />
       }
 
-      {(percentage * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+      {percentage !== 0 ? (percentage * 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ''}
       &nbsp;%
     </div>
   )
