@@ -76,6 +76,7 @@ export default function ProductDetails({
     else if (!invalidTrackers.some(invalidId => invalidId === id)) {
       setInvalidTrackers([...invalidTrackers, id]);
     }
+    router.replace(router.asPath);
   }
 
   const mapDates = useCallback((product: Product) => {

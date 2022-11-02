@@ -24,13 +24,13 @@ export function TrackerRow({
   invalid = false,
   onTrackSingleResult
 }: TrackerRowProps) {
-  const [isTracking, setIsTracking] = useState(false);
+  const [inOperation, setInOperation] = useState(false);
 
-  async function onTrackSingle(trackerId: number) {
-    setIsTracking(true);
+  async function onTrack() {
+    setInOperation(true);
 
     try {
-      const response = await fetch(`/api/trackers/${trackerId}/track`, {
+      const response = await fetch(`/api/trackers/${tracker.id}/track`, {
         method: 'POST'
       });
 
@@ -40,7 +40,25 @@ export function TrackerRow({
       console.log(error);
     }
     finally {
-      setIsTracking(false);
+      setInOperation(false);
+    }
+  }
+
+  async function onDelete() {
+    setInOperation(true);
+
+    try {
+      const response = await fetch(`/api/trackers/${tracker.id}`, {
+        method: 'DELETE'
+      });
+
+      onTrackSingleResult(response.status === 200);
+    }
+    catch (error) {
+      console.log(error);
+    }
+    finally {
+      setInOperation(false);
     }
   }
 
@@ -63,10 +81,10 @@ export function TrackerRow({
       <Table.Cell>
         <div className='flex justify-end gap-1 items-center'>
           {invalid && <BiErrorCircle size={20} className='fill-red-600' />}
-          <Button variant='success' size='sm' onClick={() => onTrackSingle(tracker.id)} loading={isTracking}>
+          <Button variant='success' size='sm' onClick={() => onTrack()} loading={inOperation} disabled={inOperation}>
             <BiScan size={16} />
           </Button>
-          <Button variant='danger' size='sm'>
+          <Button variant='danger' size='sm' onClick={() => onDelete()} disabled={inOperation}>
             <BiTrash size={16} />
           </Button>
         </div>

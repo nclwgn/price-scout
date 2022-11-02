@@ -107,8 +107,22 @@ export default function Products({
     }
   }
 
-  function onDelete(id?: number) {
+  async function onDelete(id: number) {
     send({ type: 'DELETE', id });
+
+    try {
+      await fetch(`api/products/${id}`, {
+        method: 'DELETE'
+      });
+
+      router.replace(router.asPath);
+    }
+    catch (error) {
+      console.log(error);
+    }
+    finally {
+      send('DELETED');
+    }
 
     setTimeout(() => {
       send('DELETED')
