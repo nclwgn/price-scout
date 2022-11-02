@@ -197,6 +197,9 @@ export async function getServerSideProps({ params }: GetServerSidePropsContext):
     where: { id },
     include: {
       trackers: {
+        where: {
+          active: true
+        },
         select: {
           id: true,
           url: true,

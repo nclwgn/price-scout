@@ -203,6 +203,9 @@ export default function Products({
 
 export async function getServerSideProps(): Promise<GetServerSidePropsResult<ProductsProps>> {
   const products = await prisma.product.findMany({
+    where: {
+      active: true
+    },
     include: {
       trackers: {
         include: {

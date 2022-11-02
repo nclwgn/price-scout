@@ -11,6 +11,7 @@ model Product {
   id       Int       @id @default(autoincrement())
   name     String
   trackers Tracker[]
+  active   Boolean   @default(true)
 }
 
 model Tracker {
@@ -20,6 +21,7 @@ model Tracker {
   product       Product       @relation(fields: [productId], references: [id])
   productId     Int
   records       TrackRecord[]
+  active        Boolean       @default(true)
 }
 
 model TrackRecord {
