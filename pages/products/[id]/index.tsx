@@ -1,4 +1,4 @@
-import { GetServerSideProps } from "next";
+import { GetServerSidePropsContext, GetServerSidePropsResult } from "next";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
 import { BiRadar, BiScan } from "react-icons/bi";
@@ -20,6 +20,7 @@ interface Tracker {
   querySelector: string;
   lastPrice?: number;
   lastTracked?: string;
+  priceIncrease?: number;
   records: TrackRecord[];
 }
 
@@ -189,7 +190,7 @@ export default function ProductDetails({
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export async function getServerSideProps({ params }: GetServerSidePropsContext): Promise<GetServerSidePropsResult<ProductDetailsProps>> {
   const id = parseInt(params?.id?.toString() ?? '');
 
   const product = await prisma.product.findUnique({
@@ -218,29 +219,61 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
   if (!product) {
     return {
       redirect: {
-        destination: '/products'
-      },
-      props: {}
+        destination: '/products',
+        permanent: false
+      }
     }
   }
 
+  let output: Product = {
+    id: product.id,
+    name: product.name,
+    trackers: product.trackers.map(tracker => ({
+      id: tracker.id,
+      url: tracker.url,
+      querySelector: tracker.querySelector,
+      lastPrice: Number(tracker.records[0]?.price),
+      lastTracked: tracker.records[0]?.date.toISOString() ?? null,
+      records: tracker.records.map(record => ({
+        date: record.date.toISOString(),
+        price: Number(record.price)
+      }))
+    }))
+  };
+
+  for (const tracker of product.trackers) {
+    if (tracker.records.length > 0) {
+      // Gets all tracked dates in timestamp and selects the most recent one
+      const recordsWithTimestamp = tracker.records.map(record => {
+        const date = record.date;
+        date.setHours(0, 0, 0, 0);
+  
+        return {
+          ...record,
+          timestamp: date.getTime()
+        };
+      });
+      const lastTrackedTimestamp = recordsWithTimestamp[0].timestamp;
+      const lastTrackedDate = new Date();
+      lastTrackedDate.setTime(lastTrackedTimestamp);
+  
+      // Gets the last date before the most recent
+      const nonLastTrackedRecords = recordsWithTimestamp.filter(record => record.timestamp !== lastTrackedTimestamp);
+      
+      if (nonLastTrackedRecords.length > 0) {
+        const priceIncrease = (Number(recordsWithTimestamp[0].price) / Number(nonLastTrackedRecords[0].price)) - 1;
+  
+        const outputTracker = output.trackers.find(outputTracker => outputTracker.id === tracker.id)
+        if (outputTracker)
+          outputTracker.priceIncrease = priceIncrease;
+      }
+    }
+  }
+
+
   return {
     props: {
-      product: {
-        id: product.id,
-        name: product.name,
-        trackers: product.trackers.map(tracker => ({
-          id: tracker.id,
-          url: tracker.url,
-          querySelector: tracker.querySelector,
-          lastPrice: Number(tracker.records[0]?.price),
-          lastTracked: tracker.records[0]?.date.toISOString() ?? null,
-          records: tracker.records.map(record => ({
-            date: record.date.toISOString(),
-            price: Number(record.price)
-          }))
-        }))
-      }
+      product: output
     }
   };
 }

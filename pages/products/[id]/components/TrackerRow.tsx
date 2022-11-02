@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BiErrorCircle, BiScan, BiTrash } from "react-icons/bi";
 import { Button } from "../../../../components/Button";
+import { IncreaseBadge } from "../../../../components/IncreaseBadge";
 import { Table } from "../../../../components/Table";
 
 interface Tracker {
@@ -9,6 +10,7 @@ interface Tracker {
   querySelector: string;
   lastPrice?: number;
   lastTracked?: string;
+  priceIncrease?: number;
 }
 
 interface TrackerRowProps {
@@ -48,9 +50,10 @@ export function TrackerRow({
       <Table.Cell>{tracker.url}</Table.Cell>
       <Table.Cell>{tracker.querySelector}</Table.Cell>
       <Table.Cell>
-        {tracker.lastPrice ?
-        'R$ ' + tracker.lastPrice?.toLocaleString('pt-BR', {minimumFractionDigits: 2}) :
-        '--'}
+        {!!tracker.lastPrice &&
+          'R$ ' + tracker.lastPrice?.toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+        {!!tracker.priceIncrease &&
+          <IncreaseBadge percentage={tracker.priceIncrease} />}
       </Table.Cell>
       <Table.Cell>
         {tracker.lastTracked ?
