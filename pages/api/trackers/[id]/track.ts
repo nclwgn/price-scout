@@ -34,8 +34,6 @@ export default async function TrackSingle(
 
   const trackRecords = await track([tracker]);
 
-  console.log(JSON.stringify(trackRecords, undefined, 2))
-
   if (trackRecords.errors.length > 0) {
     return res.status(400).json({
       errorCode: 'tracking-error',

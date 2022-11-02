@@ -290,8 +290,6 @@ export async function getServerSideProps(): Promise<GetServerSidePropsResult<Pro
             const increaseComparisonLowestPrice = Math.min(...records.filter(record => record.date.getTime() === increaseComparisonTimestamp).map(record => Number(record.price)));
             const priceIncrease = (lowestPrice / increaseComparisonLowestPrice) - 1;
 
-            if (product.id === 21) console.log(lowestPrice, '/', increaseComparisonLowestPrice, '=', priceIncrease)
-
             output.priceIncrease = priceIncrease;
           }
         }
