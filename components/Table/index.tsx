@@ -43,7 +43,7 @@ function TableRow({
 }: TableRowProps) {
   return (
     <div
-      className='table-row border-b-2 border-white/5'
+      className='table-row border-b-2 border-white/5 hover:bg-black/20'
       {...rest}
     >
       {children}

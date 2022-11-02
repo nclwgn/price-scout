@@ -5,7 +5,7 @@ import { Heading } from '../../../components/Heading';
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { GetServerSideProps } from 'next';
+import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { prisma } from '../../../services/prisma';
 import { useRouter } from 'next/router';
 import { PageHeading } from '../../../components/PageHeading';
@@ -201,22 +201,19 @@ const Trackers = ({
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params }) => {
+export async function getServerSideProps({ params }: GetServerSidePropsContext): Promise<GetServerSidePropsResult<TrackersProps>> {
   const id = parseInt(params?.id?.toString() ?? '');
 
   const product = await prisma.product.findUnique({
-    where: { id },
-    include: {
-      trackers: true
-    }
+    where: { id }
   });
 
   if (!product) {
     return {
       redirect: {
-        destination: '/products'
-      },
-      props: {}
+        destination: '/products',
+        permanent: false
+      }
     }
   }
 
@@ -224,8 +221,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params }) => {
     props: {
       product: {
         id: product.id,
-        name: product.name,
-        trackers: product.trackers
+        name: product.name
       }
     }
   };
