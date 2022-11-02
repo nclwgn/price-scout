@@ -87,12 +87,24 @@ export default function Products({
     setIsModalOpen(false);
   }
 
-  function onTrack(id?: number) {
+  async function onTrack(id?: number) {
     send({ type: 'TRACK', id });
 
-    setTimeout(() => {
-      send({ type: 'TRACKED' })
-    }, 3000);
+    if (id) {
+      try {
+        await fetch(`/api/products/${id}/track`, {
+          method: 'POST'
+        });
+  
+        router.replace(router.asPath);
+      }
+      catch (error) {
+        console.log(error);
+      }
+      finally {
+        send('TRACKED');
+      }
+    }
   }
 
   function onDelete(id?: number) {
@@ -109,14 +121,6 @@ export default function Products({
         <PageHeading>
           <PageHeading.Title title='Listagem de produtos' />
           <PageHeading.Buttons>
-            <Button
-              variant='primary'
-              onClick={() => onTrack()}
-              disabled={!state.can({ type: 'TRACK', id: undefined })}
-              loading={state.matches('tracking') && state.context.id === undefined}
-            >
-              <BiRadar /> Rastrear todos
-            </Button>
             <Button
               variant='success'
               onClick={() => setIsModalOpen(true)}
@@ -180,14 +184,6 @@ export default function Products({
         </div>
 
         <div className='flex justify-end gap-3'>
-          <Button
-            variant='primary'
-            onClick={() => onTrack()}
-            disabled={!state.can({ type: 'TRACK', id: undefined })}
-            loading={state.matches('tracking') && state.context.id === undefined}
-          >
-            <BiRadar /> Rastrear todos
-          </Button>
           <Button
             variant='success'
             onClick={() => setIsModalOpen(true)}
