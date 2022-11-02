@@ -8,6 +8,8 @@ import { NewProductModal } from "./components/NewProductModal";
 import { useState } from "react";
 import { PageHeading } from "../../components/PageHeading";
 import { IncreaseBadge } from "../../components/IncreaseBadge";
+import { useMachine } from "@xstate/react";
+import { assign, createMachine } from "xstate";
 
 interface Product {
   id: number;
@@ -22,11 +24,61 @@ interface ProductsProps {
   products: Product[];
 }
 
+interface StateMachineContext {
+  id?: number;
+}
+
+type StateMachineEvent = { type: 'TRACK' | 'DELETE', id: number | undefined } | { type: 'TRACKED' | 'DELETED', id?: number };
+
+const setStateIdAction = assign<StateMachineContext, StateMachineEvent>((_, event) => ({ id: event.id }));
+
 export default function Products({
   products
 }: ProductsProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [state, send] = useMachine(createMachine({
+    id: 'home',
+    initial: 'idle',
+    schema: {
+      context: {} as StateMachineContext,
+      events: {} as StateMachineEvent
+    },
+    states: {
+      idle: {
+        on: {
+          TRACK: {
+            target: 'tracking',
+            actions: setStateIdAction
+          },
+          DELETE: {
+            target: 'deleting',
+            actions: setStateIdAction
+          }
+        }
+      },
+      tracking: {
+        on: {
+          TRACKED: {
+            target: 'idle',
+            actions: ['resetOperationId']
+          }
+        }
+      },
+      deleting: {
+        on: {
+          DELETED: {
+            target: 'idle',
+            actions: ['resetOperationId']
+          }
+        }
+      }
+    }
+  }, {
+    actions: {
+      resetOperationId: () => ({})
+    }
+  }));
 
   function onModalClose(shouldRefresh: boolean) {
     if (shouldRefresh)
@@ -35,13 +87,40 @@ export default function Products({
     setIsModalOpen(false);
   }
 
+  function onTrack(id?: number) {
+    send({ type: 'TRACK', id });
+
+    setTimeout(() => {
+      send({ type: 'TRACKED' })
+    }, 3000);
+  }
+
+  function onDelete(id?: number) {
+    send({ type: 'DELETE', id });
+
+    setTimeout(() => {
+      send('DELETED')
+    }, 3000);
+  }
+
   return (
     <>
       <div className='container mx-auto'>
         <PageHeading>
           <PageHeading.Title title='Listagem de produtos' />
           <PageHeading.Buttons>
-            <Button variant='success' onClick={() => setIsModalOpen(true)}>
+            <Button
+              variant='primary'
+              onClick={() => onTrack()}
+              disabled={!state.can({ type: 'TRACK', id: undefined })}
+              loading={state.matches('tracking') && state.context.id === undefined}
+            >
+              <BiRadar /> Rastrear todos
+            </Button>
+            <Button
+              variant='success'
+              onClick={() => setIsModalOpen(true)}
+            >
               <BiPlus /> Adicionar produto
             </Button>
           </PageHeading.Buttons>
@@ -72,13 +151,25 @@ export default function Products({
                 </Table.Cell>
                 <Table.Cell>
                   <div className='flex justify-end gap-1 items-center'>
-                    <Button variant='success' size='sm'>
+                    <Button
+                      variant='success'
+                      size='sm'
+                      disabled={!state.can({ type: 'TRACK', id: product.id })}
+                      loading={state.matches('tracking') && state.context.id === product.id}
+                      onClick={() => onTrack(product.id)}
+                    >
                       <BiScan size={16} />
                     </Button>
                     <Button variant='primary' size='sm' onClick={() => router.push(`/products/${product.id}`)}>
                       <BiRadar size={16} />
                     </Button>
-                    <Button variant='danger' size='sm'>
+                    <Button
+                      variant='danger'
+                      size='sm'
+                      disabled={!state.can({ type: 'DELETE', id: product.id })}
+                      loading={state.matches('deleting') && state.context.id === product.id}
+                      onClick={() => onDelete(product.id)}
+                    >
                       <BiTrash size={16} />
                     </Button>
                   </div>
@@ -88,8 +179,19 @@ export default function Products({
           </Table>
         </div>
 
-        <div className='flex justify-end'>
-          <Button variant='success' onClick={() => setIsModalOpen(true)}>
+        <div className='flex justify-end gap-3'>
+          <Button
+            variant='primary'
+            onClick={() => onTrack()}
+            disabled={!state.can({ type: 'TRACK', id: undefined })}
+            loading={state.matches('tracking') && state.context.id === undefined}
+          >
+            <BiRadar /> Rastrear todos
+          </Button>
+          <Button
+            variant='success'
+            onClick={() => setIsModalOpen(true)}
+          >
             <BiPlus /> Adicionar produto
           </Button>
         </div>
